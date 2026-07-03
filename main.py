@@ -1,9 +1,9 @@
-"""
-cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
-git add .
-git commit -m ""
-git push
-"""
+# """
+# cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
+# git add .
+# git commit -m ""
+# git push
+# """
 import os
 import requests
 from dotenv import load_dotenv
@@ -23,3 +23,29 @@ params = {
     "language" : "en-US",
     "page" : 1
 }
+
+min_rating = int(input("Enter the minimum rating (0-10): "))
+
+request = requests.get(url, headers=headers, params=params)
+
+if request.status_code == 200:
+    data = request.json()
+    movies = data["results"]
+
+    # Filters
+
+    filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
+    # Year of release
+    # Language
+
+    if filtered_movies:
+        print(f"Movies with a rating of {min_rating} or higher:")
+        for movie in filtered_movies:
+            print(f"{movie['title']} - Rating: {movie['vote_average']}")
+    else:
+        print(f"No movies found with a rating of {min_rating} or higher.")
+
+    # When printing, don't just give filter but also additional information
+
+# Potential Features
+# 1. Give URL link to the movie
