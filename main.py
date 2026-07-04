@@ -64,11 +64,20 @@ if request.status_code == 200:
             print(f"Release Date: {movie['release_date']}")
             print(f"Language: {movie['original_language']}")
             print(f"Rating: {movie['vote_average']}")
+
+            # Display movie poster
+            # Get URL
+            poster_path = movie.get("poster_path")
+            image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
+            image = Image.open(image_bytes)
+            image.show()
+            
             
     else:
         print(f"No movies found")
 
     print("------------------------------")
+    image.close()
 
     # When printing, don't just give filter but also additional information
 
