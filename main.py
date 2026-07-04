@@ -7,6 +7,8 @@ git push
 import os
 import requests
 from dotenv import load_dotenv
+import io
+from PIL import Image
 
 load_dotenv()
 TMDB_API_TOKEN = os.getenv("TMDB_API_TOKEN")
@@ -62,6 +64,7 @@ if request.status_code == 200:
             print(f"Release Date: {movie['release_date']}")
             print(f"Language: {movie['original_language']}")
             print(f"Rating: {movie['vote_average']}")
+            
     else:
         print(f"No movies found")
 
