@@ -1,7 +1,7 @@
 r"""
 cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
 git add .
-git commit -m "Fixed year by making it a range instead of exact year"
+git commit -m "Displayed the posters in the terminal"
 git push
 """
 import os
@@ -9,6 +9,42 @@ import requests
 from dotenv import load_dotenv
 import io
 from PIL import Image
+
+def display_poster_in_terminal(poster_snippet, width=100):
+    if not poster_snippet:
+        print("❌ No poster available.")
+        return
+
+    full_poster_url = f"https://image.tmdb.org/t/p/w200{poster_snippet}"  # Use a smaller base size
+    
+    try:
+        response = requests.get(full_poster_url)
+        if response.status_code == 200:
+            # Open with Pillow
+            img = Image.open(io.BytesIO(response.content))
+            
+            # 1. Calculate height based on terminal character aspect ratios (characters are taller than they are wide)
+            aspect_ratio = img.height / img.width
+            height = int(width * aspect_ratio * 0.55) 
+            
+            # 2. Resize image to match terminal constraints
+            img = img.resize((width, height)).convert("RGB")
+            
+            # 3. Loop through pixels and build the text map
+            print("\n🖼️ Loading Terminal Art Poster:")
+            for y in range(height):
+                line = ""
+                for x in range(width):
+                    r, g, b = img.getpixel((x, y))
+                    # Use ANSI background color codes to print matching color blocks
+                    line += f"\033[48;2;{r};{g};{b}m  "
+                # Reset terminal color formatting at the end of every line
+                print(line + "\033[0m")
+                
+        else:
+            print("❌ Could not load poster.")
+    except Exception as e:
+        print(f"❌ Terminal rendering error: {e}")
 
 load_dotenv()
 TMDB_API_TOKEN = os.getenv("TMDB_API_TOKEN")
@@ -68,16 +104,19 @@ if request.status_code == 200:
             # Display movie poster
             # Get URL
             poster_path = movie.get("poster_path")
+
             image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
-            image = Image.open(image_bytes)
-            image.show()
+
+            # Display poster in terminal
+            display_poster_in_terminal(poster_path, width=100)
+            
             
             
     else:
         print(f"No movies found")
 
     print("------------------------------")
-    image.close()
+
 
     # When printing, don't just give filter but also additional information
 
