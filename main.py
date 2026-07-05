@@ -1,7 +1,7 @@
 r"""
 cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
 git add .
-git commit -m "Added Randomise Movie Feature"
+git commit -m "Made the printing into a helper function"
 git push
 """
 import os
@@ -47,6 +47,19 @@ def display_poster_in_terminal(poster_snippet, width=50):
             # Print using the 24-bit color escape sequence for foreground and background colors 
             line += f"\033[38;2;{r1};{g1};{b1}m\033[48;2;{r2};{g2};{b2}m▀"
         print(line + "\033[0m")
+
+def print_movie_info(movie):
+    print("------------------------------")
+    print(f"{movie['title']}")
+    print(f"Overview: {movie['overview']}")
+    print(f"Release Date: {movie['release_date']}")
+    print(f"Language: {movie['original_language']}")
+    print(f"Rating: {movie['vote_average']}")
+    print(f"Link: https://www.themoviedb.org/movie/{movie['id']}")
+
+    poster_path = movie.get("poster_path")
+    image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
+    display_poster_in_terminal(poster_path, width=100)
 
 load_dotenv()
 TMDB_API_TOKEN = os.getenv("TMDB_API_TOKEN")
@@ -95,21 +108,9 @@ if request.status_code == 200:
         randomize = input("Randomize movie? y/n: ")
         if randomize.lower() == "y":
             movie = random.choice(movies)
-            print("------------------------------")
-            print(f"{movie['title']}")
-            print(f"Overview: {movie['overview']}")
-            print(f"Release Date: {movie['release_date']}")
-            print(f"Language: {movie['original_language']}")
-            print(f"Rating: {movie['vote_average']}")
-            print(f"Link: https://www.themoviedb.org/movie/{movie['id']}")
+            print_movie_info(movie)
 
-            poster_path = movie.get("poster_path")
-            image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
-            display_poster_in_terminal(poster_path, width=100)
     else:
-
-        # Filters
-
         filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
         # Year of release
         if year_release:
@@ -128,26 +129,8 @@ if request.status_code == 200:
                 
         if filtered_movies:
             for movie in filtered_movies:
-                print("------------------------------")
-                print(f"{movie['title']}")
-                print(f"Overview: {movie['overview']}")
-                print(f"Release Date: {movie['release_date']}")
-                print(f"Language: {movie['original_language']}")
-                print(f"Rating: {movie['vote_average']}")
-
-                poster_path = movie.get("poster_path")
-
-                image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
-
-                # Display poster in terminal
-                display_poster_in_terminal(poster_path, width=100)
+                print_movie_info(movie)
         else:
             print(f"No movies found")
 
         print("------------------------------")
-
-
-    # When printing, don't just give filter but also additional information
-
-# Potential Features
-# 1. Give URL link to the movie
