@@ -1,7 +1,7 @@
 r"""
 cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
 git add .
-git commit -m "Forced a format for input questions"
+git commit -m "Fixed infinite loop"
 git push
 """
 import os
@@ -67,6 +67,9 @@ while True:
     if min_rating and (not min_rating.isdigit() or not (0 <= int(min_rating) <= 10)):
         print("Invalid Format. Please enter a number between 0 and 10")
         continue
+    else:
+        min_rating = int(min_rating)
+        
     year_release = input("Enter Year Range (e.g., '2020> OR 2020-2023 OR <2023 or blank for any year'): ")
     if year_release and not (year_release[-1] == ">" or year_release[0] == "<" or "-" in year_release):
         print("Invalid format. Please use 'YYYY>', '<YYYY', or 'YYYY-YYYY'")
@@ -75,7 +78,6 @@ while True:
     if language and len(language) != 2:
         print("Invalid Format. Please enter a 2-letter language code")
         continue
-    False
     break
 
 request = requests.get(url, headers=headers, params=params)
