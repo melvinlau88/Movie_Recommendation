@@ -101,6 +101,7 @@ if request.status_code == 200:
             print(f"Release Date: {movie['release_date']}")
             print(f"Language: {movie['original_language']}")
             print(f"Rating: {movie['vote_average']}")
+            print(f"Link: https://www.themoviedb.org/movie/{movie['id']}")
 
             poster_path = movie.get("poster_path")
             image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
@@ -150,5 +151,3 @@ if request.status_code == 200:
 
 # Potential Features
 # 1. Give URL link to the movie
-# 3. Force a format for the year range input to avoid errors
-# 4. Randomize movie
