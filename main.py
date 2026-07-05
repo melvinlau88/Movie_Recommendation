@@ -102,43 +102,48 @@ if request.status_code == 200:
             print(f"Language: {movie['original_language']}")
             print(f"Rating: {movie['vote_average']}")
 
-    # Filters
-
-    filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
-    # Year of release
-    if year_release:
-        if year_release[-1] == ">":
-            movie_year = int(year_release[0:4])
-            filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) >= int(year_release[0:4])]
-
-        elif year_release[0] == "<":
-            movie_year = int(year_release[1:5])
-            filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) <= int(year_release[1:5])]
-
-        elif "-" in year_release:
-            first_year, second_year = map(int, year_release.split("-"))
-            filtered_movies = [movie for movie in filtered_movies if first_year <= int(movie["release_date"][:4]) <= second_year]
-
-            
-    if filtered_movies:
-        for movie in filtered_movies:
-            print("------------------------------")
-            print(f"{movie['title']}")
-            print(f"Overview: {movie['overview']}")
-            print(f"Release Date: {movie['release_date']}")
-            print(f"Language: {movie['original_language']}")
-            print(f"Rating: {movie['vote_average']}")
-
             poster_path = movie.get("poster_path")
-
             image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
-
-            # Display poster in terminal
             display_poster_in_terminal(poster_path, width=100)
     else:
-        print(f"No movies found")
 
-    print("------------------------------")
+        # Filters
+
+        filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
+        # Year of release
+        if year_release:
+            if year_release[-1] == ">":
+                movie_year = int(year_release[0:4])
+                filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) >= int(year_release[0:4])]
+
+            elif year_release[0] == "<":
+                movie_year = int(year_release[1:5])
+                filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) <= int(year_release[1:5])]
+
+            elif "-" in year_release:
+                first_year, second_year = map(int, year_release.split("-"))
+                filtered_movies = [movie for movie in filtered_movies if first_year <= int(movie["release_date"][:4]) <= second_year]
+
+                
+        if filtered_movies:
+            for movie in filtered_movies:
+                print("------------------------------")
+                print(f"{movie['title']}")
+                print(f"Overview: {movie['overview']}")
+                print(f"Release Date: {movie['release_date']}")
+                print(f"Language: {movie['original_language']}")
+                print(f"Rating: {movie['vote_average']}")
+
+                poster_path = movie.get("poster_path")
+
+                image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
+
+                # Display poster in terminal
+                display_poster_in_terminal(poster_path, width=100)
+        else:
+            print(f"No movies found")
+
+        print("------------------------------")
 
 
     # When printing, don't just give filter but also additional information
