@@ -42,6 +42,7 @@ def display_poster_in_terminal(poster_snippet, width=50):
             r1, g1, b1 = img.getpixel((j, i))       
             r2, g2, b2 = img.getpixel((j, i + 1))    
             
+            # Print using the 24-bit color escape sequence for foreground and background colors 
             line += f"\033[38;2;{r1};{g1};{b1}m\033[48;2;{r2};{g2};{b2}m▀"
         print(line + "\033[0m")
 
