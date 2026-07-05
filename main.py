@@ -1,7 +1,7 @@
 r"""
 cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
 git add .
-git commit -m "Made the printing into a helper function"
+git commit -m "Go through multiple pages"
 git push
 """
 import os
@@ -61,6 +61,31 @@ def print_movie_info(movie):
     image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
     display_poster_in_terminal(poster_path, width=100)
 
+while True:
+    min_rating = input("Enter the minimum rating (0-10): ")
+    if not min_rating.isdigit() or not (0 <= int(min_rating) <= 10):
+        print("Invalid Input. Please enter a number between 0 and 10")
+        continue
+    else:
+        min_rating = int(min_rating)
+        
+    year_release = input("Enter Year Range (e.g., '2020> OR 2020-2023 OR <2023 or blank for any year'): ")
+    if year_release == "":
+        year_release = None
+    elif year_release and not (year_release[-1] == ">" or year_release[0] == "<" or "-" in year_release):
+        print("Invalid Input. Please use 'YYYY>', '<YYYY', or 'YYYY-YYYY'")
+        continue
+
+    language = input("Enter the language code (e.g., 'en' for English) or leave blank for any language: ")
+    if language and len(language) != 2:
+        print("Invalid Input. Please enter a 2-letter language code")
+        continue
+    num_pages = int(input("In factor of 20. How many movies do you want to review?: "))
+    if num_pages % 20 != 0 and num_pages != 0:
+        print("Invalid Input. Enter a number in multiples of 20")
+    break
+
+
 load_dotenv()
 TMDB_API_TOKEN = os.getenv("TMDB_API_TOKEN")
 
@@ -74,36 +99,18 @@ headers = {
 }
 params = {
     "language" : "en-US",
-    "page" : 1
+    "page" : (num_pages/20)
 }
 
-while True:
-    min_rating = input("Enter the minimum rating (0-10): ")
-    if not min_rating.isdigit() or not (0 <= int(min_rating) <= 10):
-        print("Invalid Format. Please enter a number between 0 and 10")
-        continue
-    else:
-        min_rating = int(min_rating)
-        
-    year_release = input("Enter Year Range (e.g., '2020> OR 2020-2023 OR <2023 or blank for any year'): ")
-    if year_release == "":
-        year_release = None
-    elif year_release and not (year_release[-1] == ">" or year_release[0] == "<" or "-" in year_release):
-        print("Invalid format. Please use 'YYYY>', '<YYYY', or 'YYYY-YYYY'")
-        continue
 
-    language = input("Enter the language code (e.g., 'en' for English) or leave blank for any language: ")
-    if language and len(language) != 2:
-        print("Invalid Format. Please enter a 2-letter language code")
-        continue
-    break
 
 request = requests.get(url, headers=headers, params=params)
 
 if request.status_code == 200:
     data = request.json()
-    movies = data["results"]
 
+
+    movies = data["results"]
 
     if min_rating == 0 and not year_release and not language:
         while True:
@@ -112,34 +119,34 @@ if request.status_code == 200:
                 print("Enter y or n")
                 continue
             elif randomise.lower() == "y":
-                    movie = random.choice(movies)
-                    print_movie_info(movie)
-                    break
-
-
-    else:
-        filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
-        # Year of release
-        if year_release:
-            if year_release[-1] == ">":
-                movie_year = int(year_release[0:4])
-                filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) >= int(year_release[0:4])]
-
-            elif year_release[0] == "<":
-                movie_year = int(year_release[1:5])
-                filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) <= int(year_release[1:5])]
-
-            elif "-" in year_release:
-                first_year, second_year = map(int, year_release.split("-"))
-                filtered_movies = [movie for movie in filtered_movies if first_year <= int(movie["release_date"][:4]) <= second_year]
-
-                
-        if filtered_movies:
-            for movie in filtered_movies:
+                movie = random.choice(movies)
                 print_movie_info(movie)
-        else:
-            print(f"No movies found")
+                break
+            elif randomise.lower() == "n":
+                filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
+                # Year of release
+                if year_release:
+                    if year_release[-1] == ">":
+                        movie_year = int(year_release[0:4])
+                        filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) >= int(year_release[0:4])]
 
-        print("------------------------------")
+                    elif year_release[0] == "<":
+                        movie_year = int(year_release[1:5])
+                        filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) <= int(year_release[1:5])]
+
+                    elif "-" in year_release:
+                        first_year, second_year = map(int, year_release.split("-"))
+                        filtered_movies = [movie for movie in filtered_movies if first_year <= int(movie["release_date"][:4]) <= second_year]
+
+                        
+                if filtered_movies:
+                    for movie in filtered_movies:
+                        print_movie_info(movie)
+                else:
+                    print(f"No movies found")
+
+                print("------------------------------")
+                break
+        
 
 # Go thorugh multiple pages
