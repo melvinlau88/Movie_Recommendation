@@ -92,9 +92,9 @@ while True:
 
 def movie_list(url, headers, params, num_movies):
     all_movies = []
-    num_pages = (num_movies // 20) + 1
+    # num_pages = 10
 
-    for page in range(1, num_pages + 1):
+    for page in range(1, 5):
         params["page"] = page
         response = requests.get(url, headers=headers, params=params)
 
@@ -125,41 +125,48 @@ params = {
 
 movies = movie_list(url, headers, params, num_movies)
 
-if min_rating == 0 and not year_release and not language and num_movies == 1:
-    while True:
-        randomise = input("Randomise movie? y/n: ")
-        if randomise not in ("y", "n"):
-            print("Enter y or n")
-            continue
-        elif randomise.lower() == "y":
-            movie = random.choice(movies)
-            print_movie_info(movie)
-            break
-        elif randomise.lower() == "n":
-            filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
-            # Year of release
-            if year_release:
-                if year_release[-1] == ">":
-                    movie_year = int(year_release[0:4])
-                    filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) >= int(year_release[0:4])]
-
-                elif year_release[0] == "<":
-                    movie_year = int(year_release[1:5])
-                    filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) <= int(year_release[1:5])]
-
-                elif "-" in year_release:
-                    first_year, second_year = map(int, year_release.split("-"))
-                    filtered_movies = [movie for movie in filtered_movies if first_year <= int(movie["release_date"][:4]) <= second_year]
-
-                    
-            if filtered_movies:
-                for movie in filtered_movies:
+if movies:
+    if min_rating == 0 and not year_release and not language and num_movies == 1:
+        while True:
+            randomise = input("Randomise movie? y/n: ")
+            if randomise not in ("y", "n"):
+                print("Enter y or n")
+                continue
+            elif randomise.lower() == "y":
+                movie = random.choice(movies)
+                print_movie_info(movie)
+                break
+            elif randomise.lower() == "n":
+                for movie in movies:
                     print_movie_info(movie)
-            else:
-                print(f"No movies found")
+                print("------------------------------")
+                break
+    else:
+        filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
 
-            print("------------------------------")
-            break
-        
+        # Year of release
+        if year_release:
+            if year_release[-1] == ">":
+                filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) >= int(year_release[0:4])]
 
-# Go thorugh multiple pages
+            elif year_release[0] == "<":
+                filtered_movies = [movie for movie in filtered_movies if int(movie["release_date"][:4]) <= int(year_release[1:5])]
+
+            elif "-" in year_release:
+                first_year, second_year = map(int, year_release.split("-"))
+                filtered_movies = [movie for movie in filtered_movies if first_year <= int(movie["release_date"][:4]) <= second_year]
+
+        # Language
+        if language:
+            filtered_movies = [movie for movie in filtered_movies if movie["original_language"] == language]
+
+        if filtered_movies:
+            for movie in filtered_movies:
+                print_movie_info(movie)
+        else:
+            print("No movies found")
+
+        print("------------------------------")
+else:
+    print("Could not fetch movies.")
+    
