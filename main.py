@@ -1,7 +1,7 @@
 r"""
 cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
 git add .
-git commit -m "Displayed the posters in the terminal"
+git commit -m "Fixed image output in terminal"
 git push
 """
 import os
@@ -10,41 +10,40 @@ from dotenv import load_dotenv
 import io
 from PIL import Image
 
-def display_poster_in_terminal(poster_snippet, width=100):
+def display_poster_in_terminal(poster_snippet, width=50):
     if not poster_snippet:
-        print("❌ No poster available.")
+        print("No poster available.")
         return
 
-    full_poster_url = f"https://image.tmdb.org/t/p/w200{poster_snippet}"  # Use a smaller base size
+    full_poster_url = f"https://image.tmdb.org/t/p/w200{poster_snippet}"
+
+    response = requests.get(full_poster_url, timeout=5)
+    if response.status_code != 200:
+        print("No poster available")
+        return
+
+    img = Image.open(io.BytesIO(response.content))
+
+    aspect_ratio = img.height / img.width
     
-    try:
-        response = requests.get(full_poster_url)
-        if response.status_code == 200:
-            # Open with Pillow
-            img = Image.open(io.BytesIO(response.content))
+    height = int(width * aspect_ratio * 0.5)
+
+    # Ensures height is even for the 2 pixel rows representation
+    if height % 2 != 0:
+        height += 1
+
+    # Resize image to fit terminal width and make colours to be only RGB
+    img = img.resize((width, height)).convert("RGB")
+
+    for i in range(0, height, 2):
+        line = ""
+        for j in range(width):
+            # Two pixel rows are represented accounting for the 2 steps in the loop
+            r1, g1, b1 = img.getpixel((j, i))       
+            r2, g2, b2 = img.getpixel((j, i + 1))    
             
-            # 1. Calculate height based on terminal character aspect ratios (characters are taller than they are wide)
-            aspect_ratio = img.height / img.width
-            height = int(width * aspect_ratio * 0.55) 
-            
-            # 2. Resize image to match terminal constraints
-            img = img.resize((width, height)).convert("RGB")
-            
-            # 3. Loop through pixels and build the text map
-            print("\n🖼️ Loading Terminal Art Poster:")
-            for y in range(height):
-                line = ""
-                for x in range(width):
-                    r, g, b = img.getpixel((x, y))
-                    # Use ANSI background color codes to print matching color blocks
-                    line += f"\033[48;2;{r};{g};{b}m  "
-                # Reset terminal color formatting at the end of every line
-                print(line + "\033[0m")
-                
-        else:
-            print("❌ Could not load poster.")
-    except Exception as e:
-        print(f"❌ Terminal rendering error: {e}")
+            line += f"\033[38;2;{r1};{g1};{b1}m\033[48;2;{r2};{g2};{b2}m▀"
+        print(line + "\033[0m")
 
 load_dotenv()
 TMDB_API_TOKEN = os.getenv("TMDB_API_TOKEN")
@@ -90,8 +89,6 @@ if request.status_code == 200:
             filtered_movies = [movie for movie in filtered_movies if first_year <= int(movie["release_date"][:4]) <= second_year]
 
             
-
-
     if filtered_movies:
         for movie in filtered_movies:
             print("------------------------------")
