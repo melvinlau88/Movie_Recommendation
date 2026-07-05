@@ -1,14 +1,16 @@
 r"""
 cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
 git add .
-git commit -m "Fixed infinite loop"
+git commit -m "Added Randomise Movie Feature"
 git push
 """
 import os
+from random import random
 import requests
 from dotenv import load_dotenv
 import io
 from PIL import Image
+import random
 
 def display_poster_in_terminal(poster_snippet, width=50):
     if not poster_snippet:
@@ -63,17 +65,20 @@ params = {
 }
 
 while True:
-    min_rating = input("Enter the minimum rating (0-10) or blank for any year: ")
-    if min_rating and (not min_rating.isdigit() or not (0 <= int(min_rating) <= 10)):
+    min_rating = input("Enter the minimum rating (0-10): ")
+    if not min_rating.isdigit() or not (0 <= int(min_rating) <= 10):
         print("Invalid Format. Please enter a number between 0 and 10")
         continue
     else:
         min_rating = int(min_rating)
         
     year_release = input("Enter Year Range (e.g., '2020> OR 2020-2023 OR <2023 or blank for any year'): ")
-    if year_release and not (year_release[-1] == ">" or year_release[0] == "<" or "-" in year_release):
+    if year_release == "":
+        year_release = None
+    elif year_release and not (year_release[-1] == ">" or year_release[0] == "<" or "-" in year_release):
         print("Invalid format. Please use 'YYYY>', '<YYYY', or 'YYYY-YYYY'")
         continue
+
     language = input("Enter the language code (e.g., 'en' for English) or leave blank for any language: ")
     if language and len(language) != 2:
         print("Invalid Format. Please enter a 2-letter language code")
@@ -85,6 +90,17 @@ request = requests.get(url, headers=headers, params=params)
 if request.status_code == 200:
     data = request.json()
     movies = data["results"]
+
+    if min_rating == 0 and not year_release and not language:
+        randomize = input("Randomize movie? y/n: ")
+        if randomize.lower() == "y":
+            movie = random.choice(movies)
+            print("------------------------------")
+            print(f"{movie['title']}")
+            print(f"Overview: {movie['overview']}")
+            print(f"Release Date: {movie['release_date']}")
+            print(f"Language: {movie['original_language']}")
+            print(f"Rating: {movie['vote_average']}")
 
     # Filters
 
