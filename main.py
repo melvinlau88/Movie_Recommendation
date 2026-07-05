@@ -1,7 +1,7 @@
 r"""
 cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
 git add .
-git commit -m "Fixed image output in terminal"
+git commit -m "Forced a format for input questions"
 git push
 """
 import os
@@ -62,9 +62,21 @@ params = {
     "page" : 1
 }
 
-min_rating = int(input("Enter the minimum rating (0-10): "))
-year_release = input("Enter Year Range (e.g., '2020> OR 2020-2023 OR <2023'): ")
-language = input("Enter the language code (e.g., 'en' for English) or leave blank for any language: ")
+while True:
+    min_rating = input("Enter the minimum rating (0-10) or blank for any year: ")
+    if min_rating and (not min_rating.isdigit() or not (0 <= int(min_rating) <= 10)):
+        print("Invalid Format. Please enter a number between 0 and 10")
+        continue
+    year_release = input("Enter Year Range (e.g., '2020> OR 2020-2023 OR <2023 or blank for any year'): ")
+    if year_release and not (year_release[-1] == ">" or year_release[0] == "<" or "-" in year_release):
+        print("Invalid format. Please use 'YYYY>', '<YYYY', or 'YYYY-YYYY'")
+        continue
+    language = input("Enter the language code (e.g., 'en' for English) or leave blank for any language: ")
+    if language and len(language) != 2:
+        print("Invalid Format. Please enter a 2-letter language code")
+        continue
+    False
+    break
 
 request = requests.get(url, headers=headers, params=params)
 
@@ -99,17 +111,12 @@ if request.status_code == 200:
             print(f"Language: {movie['original_language']}")
             print(f"Rating: {movie['vote_average']}")
 
-            # Display movie poster
-            # Get URL
             poster_path = movie.get("poster_path")
 
             image_bytes = io.BytesIO(requests.get(f"https://image.tmdb.org/t/p/w500{poster_path}").content)
 
             # Display poster in terminal
             display_poster_in_terminal(poster_path, width=100)
-            
-            
-            
     else:
         print(f"No movies found")
 
@@ -120,6 +127,5 @@ if request.status_code == 200:
 
 # Potential Features
 # 1. Give URL link to the movie
-# 2. Display images???
 # 3. Force a format for the year range input to avoid errors
 # 4. Randomize movie
