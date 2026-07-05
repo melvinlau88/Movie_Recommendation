@@ -104,11 +104,18 @@ if request.status_code == 200:
     data = request.json()
     movies = data["results"]
 
+
     if min_rating == 0 and not year_release and not language:
-        randomize = input("Randomize movie? y/n: ")
-        if randomize.lower() == "y":
-            movie = random.choice(movies)
-            print_movie_info(movie)
+        while True:
+            randomise = input("Randomise movie? y/n: ")
+            if randomise not in ("y", "n"):
+                print("Enter y or n")
+                continue
+            elif randomise.lower() == "y":
+                    movie = random.choice(movies)
+                    print_movie_info(movie)
+                    break
+
 
     else:
         filtered_movies = [movie for movie in movies if movie["vote_average"] >= min_rating]
@@ -134,3 +141,5 @@ if request.status_code == 200:
             print(f"No movies found")
 
         print("------------------------------")
+
+# Go thorugh multiple pages
