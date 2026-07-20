@@ -1,9 +1,3 @@
-r"""
-cd C:\Users\melvi\Downloads\VS_Code\Python\Movie_Recommendation
-git add .
-git commit -m "Go through multiple pages"
-git push
-"""
 import os
 from random import random
 import requests
